@@ -26,13 +26,12 @@ import java.util.stream.Collectors;
  */
 public class Week3_Twelve {
 	
+	//read in data from file and store words in list
 	static class DataStorageManager{
 		private List<String> linesInText = new LinkedList<>();
 		private  List<String> wordsList = new LinkedList<>();
-		
-		
+			
 		public List<String> dispatch(List<String> message) {
-
 			if(message.get(0).equals("init")) {
 		
 				return this.init(message.get(1));
@@ -42,14 +41,12 @@ public class Week3_Twelve {
 				System.out.println("Message not understood DataStorageManager "+message.get(0));
 				System.exit(0);
 			}
-		
-			return message;
-			
+			return message;			
 		}
 		
 		private List<String> init(String filePath){
-			// File textFile = new File("../"+fileName.trim());
-			File textFile = new File(filePath.trim());
+			File textFile = new File("../"+filePath.trim());
+			//File textFile = new File(filePath.trim());
 			Scanner scanText;
 			try {
 				String line = null;
@@ -61,14 +58,11 @@ public class Week3_Twelve {
 						continue;
 					linesInText.add(line);
 				}
-				scanText.close();
-				
-				
+				scanText.close();			
 			} catch (FileNotFoundException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
-			
+			}		
 			return linesInText;
 		}
 		
@@ -84,11 +78,11 @@ public class Week3_Twelve {
 		}
 		
 	}	
-		
+
+	//generate list of stopwords and check for stopwords
  static	class StopWordManager{
 		private List<String> stopWords = new LinkedList<>();
-
-		
+	
 		public Object dispatch(List<String>message) {
 			
 			if(message.get(0).equals("stop")){
@@ -107,7 +101,7 @@ public class Week3_Twelve {
 		
 		private List<String> stopWords(){
 			try {
-				stopWords = Files.readAllLines(Paths.get("stop_words.txt"));
+				stopWords = Files.readAllLines(Paths.get("../stop_words.txt"));
 				stopWords = new LinkedList<String>(Arrays.asList(stopWords.get(0).split(",")));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -117,6 +111,7 @@ public class Week3_Twelve {
 		}
 	}	
 	
+ //determine word frequencies and sort
  static class WordFrequencyManager{
 		private Map<String, Long> wordFrequency = new HashMap<>();
 		
@@ -151,6 +146,7 @@ public class Week3_Twelve {
 		}
 	}
 
+ //control class initializes all others
 	static class WordFrequencyController{
 		
 		private static DataStorageManager storageManager;
@@ -186,8 +182,7 @@ public class Week3_Twelve {
 					wordFrequencyManager.dispatch(Arrays.asList("incrementCount",word));
 				}
 			}
-			
-			
+						
 			Map<String, Long> frequencies = wordFrequencyManager.dispatch(Arrays.asList("sorted"));
 			
 			int num = 25;
@@ -202,8 +197,6 @@ public class Week3_Twelve {
 		
 
 	}
-	
-	
 	
 	public static void main(String[] args) {
 		WordFrequencyController freqController = new WordFrequencyController();

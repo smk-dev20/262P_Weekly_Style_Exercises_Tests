@@ -24,12 +24,13 @@ import java.util.stream.Collectors;
  * At different times in computation entities call the others that have registered
  * References
  * https://github.com/crista/exercises-in-programming-style/blob/master/15-hollywood/tf-15.py
- * Code written for Week1 and Week2
+ * Code written for Week1 and Week2 and Thirteen for Week3
  */
 
 
 public class Week3_Fifteen {
 	
+	//framework registers entities and calls them on event occurrence
 	static class WordFrequencyFrameWork{
 		private List<Object> loadEventHandlers = new LinkedList<>();
 		private List<Object> workEventHandlers = new LinkedList<>();
@@ -49,7 +50,10 @@ public class Week3_Fifteen {
 		
 		public void run(String filePath) {
 			for(Object handler : this.loadEventHandlers) {
-				((Consumer<String>) handler).accept(filePath);
+				if(handler instanceof Consumer)
+					((Consumer<String>) handler).accept(filePath);
+				if(handler instanceof Runnable)
+					((Runnable) handler).run();
 			}
 			
 			for(Object handler : this.workEventHandlers) {
@@ -58,14 +62,11 @@ public class Week3_Fifteen {
 			
 			for(Object handler : this.endEventHandlers) {
 				((Runnable) handler).run();
-			}
-			
-		}
-		
-		
-		
+			}	
+		}		
 	}//end class WordFrequencyFrameWork
 
+	//read in data process and store in list
  static class DataStorage{
 		private List<String> linesInText = new LinkedList<>();
 		private  List<String> wordsList = new LinkedList<>();
@@ -81,7 +82,7 @@ public class Week3_Fifteen {
 		}
 		
 		private void load(String filePath) {
-			File textFile = new File(filePath.trim());
+			File textFile = new File("../"+filePath.trim());
 			Scanner scanText;
 			try {
 				String currentLine = null;
@@ -127,17 +128,18 @@ public class Week3_Fifteen {
 	}//end class DataStorage
 	
 	
+ //generate stop words check for stop word
 static class StopWordsFilter{
 		private List<String> stopWords = new LinkedList<>();
 		
 		private StopWordsFilter(WordFrequencyFrameWork wfApp) {
-			Consumer<String> func = path -> load(path);
+			Runnable func = () -> load();
 			wfApp.registerForLoadEvent(func);
 		}
 		
-		private void load(String stopfilePath){
+		private void load(){
 			try {
-				stopWords = Files.readAllLines(Paths.get("stop_words.txt"));
+				stopWords = Files.readAllLines(Paths.get("../stop_words.txt"));
 				stopWords = new LinkedList<String>(Arrays.asList(stopWords.get(0).split(",")));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -151,7 +153,7 @@ static class StopWordsFilter{
 		
 	}//end class StopWordsFilter
 
-	
+	//determine frequency sort and print
 	static class WordFrequencyCounter{
 		
 		private Map<String, Long> wordFrequency = new HashMap<>();
@@ -185,6 +187,9 @@ static class StopWordsFilter{
 		
 	}//end class WordFrequencyCounter
 	
+	/****************** Upto here 15.1 ***********************************************/
+	
+	//registers for word events, counts z words and prints
 	static class ZFrequencyCounter{
 		private int zFreq = 0;
 		private ZFrequencyCounter(WordFrequencyFrameWork wfApp, DataStorage dataStorage) {
@@ -207,14 +212,13 @@ static class StopWordsFilter{
 	
 	
 public static void main(String[] args) {
-	WordFrequencyFrameWork wfApp = new WordFrequencyFrameWork();
 	
+	WordFrequencyFrameWork wfApp = new WordFrequencyFrameWork();	
 	StopWordsFilter stopFilter = new StopWordsFilter(wfApp);
-	
 	DataStorage dataStorage = new DataStorage(wfApp, stopFilter);
-	
 	WordFrequencyCounter freqCounter = new WordFrequencyCounter(wfApp, dataStorage);
 	
+	//added for 15.2
 	ZFrequencyCounter zCounter = new ZFrequencyCounter(wfApp,dataStorage);
 	
 	wfApp.run(args[0]);

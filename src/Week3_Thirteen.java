@@ -26,6 +26,11 @@ import java.util.stream.Collectors;
  * 
  * References
  * https://github.com/crista/exercises-in-programming-style/blob/master/12-letterbox/tf-12.py
+ * https://mkyong.com/java8/java-8-function-examples/
+ * https://java2blog.com/java-8-supplier-example/
+ * https://www.javainterviewpoint.com/java-consumer-example/
+ * http://learnitweb.com/java-8/java8-tutorial/java-8-runnable-example-using-lambda-expression/
+ * https://stackoverflow.com/questions/29945627/java-8-lambda-void-argument
  * Code written for Week1 and Week2
  */
 
@@ -35,7 +40,7 @@ public class Week3_Thirteen {
 public static void extractWords(Map<String, Object> map, String filePath) {
  List<String> linesInText = new LinkedList<>();
   List<String> wordsList = new LinkedList<>();
-	File textFile = new File(filePath.trim());
+	File textFile = new File("../"+filePath.trim());
 	Scanner scanText;
 	try {
 		String currentLine = null;
@@ -69,7 +74,7 @@ public static void extractWords(Map<String, Object> map, String filePath) {
 public static void loadStopWords(Map<String, Object> map) {
 	List<String> stopWords = new LinkedList<>();
 	try {
-		stopWords = Files.readAllLines(Paths.get("stop_words.txt"));
+		stopWords = Files.readAllLines(Paths.get("../stop_words.txt"));
 	} catch (IOException e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
@@ -154,7 +159,8 @@ public static void main(String[] args) {
 //		} else
 //			break;
 //	}
-	/****************** Upto here was 13.1 *********************/
+	/****************** Upto here was 13.1*********************/
+	/******Commented code corresponds to deletion of last 3 lines in python example*****************/ 
 	
    //sort and print functionailty added to Runnable for requirement 13.2
 	Runnable runnable = () -> {
@@ -172,9 +178,10 @@ public static void main(String[] args) {
 	};
 
 	//Runnable method added to wordFreq map
-	wordFreqObj.put("top25", new Thread(runnable));
-    //calling added method
-	((Thread) wordFreqObj.get("top25")).start();
+	wordFreqObj.put("top25", runnable);
+    
+	//calling added method
+	((Runnable) wordFreqObj.get("top25")).run();
 }
 
 
