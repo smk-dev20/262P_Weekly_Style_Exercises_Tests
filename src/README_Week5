@@ -1,0 +1,25 @@
+change directory into framework-src and compile add
+javac *.java
+
+Change directory into framework and run below for jar
+\framework>jar cfm framework.jar manifest.mf *.class
+
+Change directory into app1 within plugins-src provide path to created framework.jar when compiling
+Repeat in app2
+plugins-src\app1javac -cp C:\Users\Sherlin\Desktop\UCI\Winter_2021\262P_Programming_Styles\262P_Weekly_Style_Exercises_Tests\src\framework.jar *.java
+
+Change directory into plugins/app1 and run below for jar
+plugins\app1>jar cf app1.jar *.class
+
+Change directory into plugins/app2 run below for jar
+plugins\app2>jar cf app2.jar *.class
+
+# framework.jar app1.jar and app2.jar are moved to main folder(deployment site) which also
+# contains config file specify in config file path to the app*.jar and specific jar to use
+# note app1.jar has words1 and frequency1 classes
+	   app2.jar has words2 and frequency2 classes
+	   Update the corresponding properties accordingly
+
+Final run command for Twenty	   
+>java -jar framework.jar ../pride-and-prejudice.txt
+	   
