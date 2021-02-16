@@ -31,12 +31,12 @@ import java.util.stream.Collectors;
 
 public class Week6_TwentyEight {
 	
-	//every call to next() reads in a line from the file and returns a list of characters in the line
-	static class CharGen implements Iterator<List<Character>>{
+	//every call to next() reads in a line from the file and returns the line
+	static class LineGen implements Iterator<String>{
 		BufferedReader reader = null;
 		String line = null;
 		
-		public CharGen(String path) {
+		public LineGen(String path) {
 			try {
 				reader = new BufferedReader(new FileReader(path));
 			} catch (FileNotFoundException e) {
@@ -58,69 +58,46 @@ public class Week6_TwentyEight {
 		}
 
 		@Override
-		public List<Character> next() {
-			List<Character> charsInLine = new LinkedList<>();
+		public String next() {
+			
 			try {
-				line =  reader.readLine();
-				if(line!="") {
-				charsInLine = line.chars()
-					    .mapToObj(e->(char)e).collect(Collectors.toList());
-				}
-					
+				line =  reader.readLine();					
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-			return charsInLine;
+			return line;
 		}
 		
 	}
 	
-	// every call to next() pulls from previous iterator and returns list of words
-	// formed from those characters
+	// every call to next() pulls one line from previous iterator and returns list of words
+	// formed from the line after processing for lowercase/length etc
 	static class WordGen implements Iterator<List<String>>{
-		private Iterator<List<Character>> charGen;
+		private Iterator<String> lineGen;
 		
 		public WordGen(String path) {
-			 charGen = new CharGen(path);
+			 lineGen = new LineGen(path);
 		}
 		@Override
 		public boolean hasNext() {
 			// TODO Auto-generated method stub
-			return charGen.hasNext();
+			return lineGen.hasNext();
 		}
 
 		@Override
 		public List<String> next() {
 			List<String> words = new LinkedList<>();
 			
-			while(charGen.hasNext()) {
-			List<Character> charsInLine = charGen.next();
-			String word = "";
-			boolean startChar = true;
-			for(char c: charsInLine) {
-				if (startChar) {
-					if (Character.isLetterOrDigit(c)) {
-						word += Character.toLowerCase(c);
-						startChar = false;
-					}
-				} else {
-					if (Character.isLetterOrDigit(c)) {
-						word += Character.toLowerCase(c);
-					} else {
-						startChar = true;
-						words.add(word);
-						//reset for next word
-						word = "";
-					}
-				}			
-			}//end for
-			if(!word.equals(""))
-				words.add(word);
-			return words;
+			while(lineGen.hasNext()) {
+			String line = lineGen.next();
+			if(line!="") {
+			words.addAll(new ArrayList<String>(Arrays.asList(line.replaceAll("[^a-zA-Z0-9]", " ").toLowerCase().trim().split("\\s+"))));	
+			words.removeIf(word -> (word.length() < 2 || word.equals("")));
+			}
+			 return words;
 			}//end hasNext
 			
-			//return final words list on termination of previous iterator
 			return words;
 		}//end next	
 	}
@@ -154,7 +131,7 @@ public class Week6_TwentyEight {
 			while(wordGen.hasNext()) {
 				List<String> allWordsInLine = wordGen.next();
 				for(String word : allWordsInLine) {
-					if(!word.equals("") && !(word.length()<2) && !stopWords.contains(word)) {
+					if(!stopWords.contains(word)) {
 						words.add(word);
 					}
 				}	
